@@ -1,5 +1,7 @@
 package io.github.emberbocor.villagertradeenchant.villager;
 
+import java.util.Set;
+
 import com.google.common.collect.ImmutableSet;
 
 import io.github.emberbocor.villagertradeenchant.VillagerTradeEnchant;
@@ -12,16 +14,23 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 public final class EnchanterProfession {
     public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VillagerTradeEnchant.MODID, "enchanter");
     public static final ResourceKey<PoiType> POI = ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, ID);
+    public static final int MAX_TICKETS = 1;
+    public static final int VALID_RANGE = 1;
 
     private EnchanterProfession() {
     }
 
+    public static Set<BlockState> jobSiteStates() {
+        return ImmutableSet.copyOf(Blocks.ENCHANTING_TABLE.getStateDefinition().getPossibleStates());
+    }
+
     public static PoiType createPoiType() {
-        return new PoiType(ImmutableSet.copyOf(Blocks.ENCHANTING_TABLE.getStateDefinition().getPossibleStates()), 1, 1);
+        return new PoiType(jobSiteStates(), MAX_TICKETS, VALID_RANGE);
     }
 
     public static VillagerProfession createProfession() {
