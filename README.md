@@ -4,7 +4,7 @@ A villager who enchants your gear, at a price you control.
 
 Villager Trade Enchant adds a new villager profession, the **Enchanter**, whose job site is the enchanting table. Instead of trading, the Enchanter opens an enchant screen: put an item in, pick the exact enchantment and level you want, pay and take the enchanted item. No lapis, no experience levels, no random rolls.
 
-Available for NeoForge.
+Available for NeoForge, Forge and Fabric.
 
 ## Features
 
@@ -39,15 +39,20 @@ Items left in the slots go back to your inventory when you close the screen.
 
 ## Requirements
 
-| | NeoForge |
-|---|---|
-| Minecraft | 1.21.1 |
-| Loader | NeoForge 21.1.4 or newer |
-| Jar | `villagertradeenchant-neoforge-1.21.1-<version>.jar` |
+| | NeoForge | Forge | Fabric |
+|---|---|---|---|
+| Minecraft | 1.21.1 | 1.21.1 | 1.21 or 1.21.1 |
+| Loader | NeoForge 21.1.4 or newer | Forge 52.0.0 or newer | Fabric Loader 0.15.11 or newer |
+| Other | | | Fabric API 0.102.0 or newer |
+| Jar | `villagertradeenchant-neoforge-1.21.1-<version>.jar` | `villagertradeenchant-forge-1.21.1-<version>.jar` | `villagertradeenchant-fabric-1.21-1.21.1-<version>.jar` |
+
+On Minecraft 1.21.1, NeoForge and Forge are separate loaders that do not run each other's mods, so each has its own jar. Pick the jar that matches your loader.
+
+The Fabric jar bundles [NightConfig](https://github.com/TheElectronWill/night-config) (core and toml, LGPL-3.0) to read the TOML config. NeoForge and Forge already ship it.
 
 ### Client and server
 
-The mod is required on both the client and the server: the profession, the job site, the enchant screen and its network messages must be known to both sides. Players without the mod cannot join a server that has it; the connection is refused at login.
+On every loader the mod is required on both the client and the server: the profession, the job site, the enchant screen and its network messages must be known to both sides. Players without the mod cannot join a server that has it; the connection is refused at login.
 
 The server decides everything that matters: which enchantments are offered, their prices and whether the payment is enough. The client only shows what the server sends.
 
@@ -103,13 +108,13 @@ The world still opens without crashing. Enchanters lose their profession and bec
 
 ### Incompatible mods
 
-A block can be the job site of only one villager profession, so mods that also make the enchanting table a job site cannot run together with this mod. NeoForge shows a clear error message at startup instead of crashing.
+A block can be the job site of only one villager profession, so mods that also make the enchanting table a job site cannot run together with this mod. NeoForge and Fabric show a clear error message at startup instead of crashing. Forge 1.21.1 cannot declare incompatible mods, so on Forge the game stops at startup with the error below instead.
 
 | Mod | Mod ID | Reason |
 |---|---|---|
 | [Villager Enchanter](https://www.curseforge.com/minecraft/mc-mods/villager-enchanter) (Forge/Fabric, up to Minecraft 1.20.2) | `villager_enchanter` | Uses the enchanting table as the job site of its own Enchanter |
 
-Any other mod that registers the enchanting table as a job site clashes the same way; NeoForge then stops at startup with "Point of interest types ... both list ... in their blockstates".
+Any other mod that registers the enchanting table as a job site clashes the same way; the game then stops at startup with an error like "Point of interest types ... both list ... in their blockstates" (NeoForge and Forge) or "... is defined in more than one PoI type" (Fabric).
 
 ### Other mods
 
@@ -123,8 +128,8 @@ Any other mod that registers the enchanting table as a job site clashes the same
 ./gradlew build
 ```
 
-The jar is written to `neoforge/build/libs/`.
+The jars are written to `neoforge/build/libs/`, `forge/build/libs/` and `fabric/build/libs/`.
 
 ## License
 
-MIT
+MIT. The Fabric jar includes NightConfig, which is licensed under the LGPL-3.0.
