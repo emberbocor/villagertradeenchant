@@ -1,4 +1,7 @@
 {
   "entity.minecraft.villager.villagertradeenchant.enchanter": "Tukang Pesona",
-  "entity.minecraft.villager.enchanter": "Tukang Pesona"
+  "entity.minecraft.villager.enchanter": "Tukang Pesona",
+  "container.villagertradeenchant.enchantments": "Pesona",
+  "container.villagertradeenchant.put_item": "Taruh barang untuk dipesonakan",
+  "container.villagertradeenchant.no_enchantments": "Tidak ada pesona yang tersedia"
 }

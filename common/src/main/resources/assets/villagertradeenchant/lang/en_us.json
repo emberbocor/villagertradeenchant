@@ -1,4 +1,7 @@
 {
   "entity.minecraft.villager.villagertradeenchant.enchanter": "Enchanter",
-  "entity.minecraft.villager.enchanter": "Enchanter"
+  "entity.minecraft.villager.enchanter": "Enchanter",
+  "container.villagertradeenchant.enchantments": "Enchantments",
+  "container.villagertradeenchant.put_item": "Put an item to enchant",
+  "container.villagertradeenchant.no_enchantments": "No enchantments available"
 }
