@@ -57,12 +57,7 @@ public class EnchantMenu extends AbstractContainerMenu {
         this.owner = villager != null && inventory.player instanceof ServerPlayer player ? player : null;
         inputs.addListener(this::slotsChanged);
 
-        addSlot(new Slot(inputs, INPUT_SLOT, 136, 37) {
-            @Override
-            public int getMaxStackSize() {
-                return 1;
-            }
-        });
+        addSlot(new InputSlot(inputs, INPUT_SLOT, 136, 37));
         addSlot(new Slot(inputs, PAYMENT_SLOT, 162, 37));
         addSlot(new ResultSlot(220, 37));
         for (int row = 0; row < 3; row++) {
@@ -257,6 +252,17 @@ public class EnchantMenu extends AbstractContainerMenu {
                 villager.setTradingPlayer(null);
             }
             clearContainer(player, inputs);
+        }
+    }
+
+    private static class InputSlot extends Slot {
+        InputSlot(Container container, int index, int x, int y) {
+            super(container, index, x, y);
+        }
+
+        @Override
+        public int getMaxStackSize() {
+            return 1;
         }
     }
 
