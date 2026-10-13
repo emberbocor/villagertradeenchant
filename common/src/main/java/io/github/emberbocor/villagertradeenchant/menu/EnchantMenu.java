@@ -1,17 +1,23 @@
 package io.github.emberbocor.villagertradeenchant.menu;
 
 import java.util.List;
+import java.util.OptionalInt;
 
 import org.jetbrains.annotations.Nullable;
 
+import io.github.emberbocor.villagertradeenchant.config.Price;
 import io.github.emberbocor.villagertradeenchant.enchant.EnchantEntries;
 import io.github.emberbocor.villagertradeenchant.enchant.EnchantEntry;
+import io.github.emberbocor.villagertradeenchant.network.EnchantEntriesPayload;
 import io.github.emberbocor.villagertradeenchant.platform.Services;
 import io.github.emberbocor.villagertradeenchant.villager.EnchanterProfession;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -19,6 +25,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 
 public class EnchantMenu extends AbstractContainerMenu {
     public static final int INPUT_SLOT = 0;
@@ -30,19 +37,24 @@ public class EnchantMenu extends AbstractContainerMenu {
 
     @Nullable
     private final Villager villager;
+    @Nullable
+    private final ServerPlayer owner;
     private final SimpleContainer inputs = new SimpleContainer(2);
     private final ResultContainer result = new ResultContainer();
     private List<EnchantEntry> entries = List.of();
     @Nullable
     private EnchantEntry selected;
+    private List<EnchantEntry> sentEntries = List.of();
+    private int sentSelection = -1;
 
     public EnchantMenu(int containerId, Inventory inventory) {
         this(containerId, inventory, null);
     }
 
-    public EnchantMenu(int containerId, Inventory inventory, @Nullable Villager villager) {
+    private EnchantMenu(int containerId, Inventory inventory, @Nullable Villager villager) {
         super(Services.PLATFORM.enchantMenuType(), containerId);
         this.villager = villager;
+        this.owner = villager != null && inventory.player instanceof ServerPlayer player ? player : null;
         inputs.addListener(this::slotsChanged);
 
         addSlot(new Slot(inputs, INPUT_SLOT, 136, 37) {
@@ -63,13 +75,68 @@ public class EnchantMenu extends AbstractContainerMenu {
         }
     }
 
+    public static void open(Player player, Villager villager) {
+        villager.setTradingPlayer(player);
+        OptionalInt containerId = player.openMenu(new SimpleMenuProvider(
+                (id, inventory, opener) -> new EnchantMenu(id, inventory, villager), villager.getDisplayName()));
+        if (containerId.isEmpty()) {
+            villager.setTradingPlayer(null);
+        }
+    }
+
     public List<EnchantEntry> entries() {
         return entries;
     }
 
     @Nullable
-    public EnchantEntry selected() {
-        return selected;
+    public EnchantEntry selectedEntry() {
+        return currentEntry();
+    }
+
+    public void setEntries(List<EnchantEntry> entries, int selection) {
+        this.entries = entries;
+        this.selected = selection >= 0 && selection < entries.size() ? entries.get(selection) : null;
+    }
+
+    public void select(ResourceKey<Enchantment> enchantment, int level) {
+        EnchantEntry entry = entries.stream()
+                .filter(candidate -> candidate.enchantment().is(enchantment) && candidate.level() == level)
+                .findFirst()
+                .orElse(null);
+        if (entry == null) {
+            syncEntries(true);
+            return;
+        }
+        selected = entry;
+        movePaymentFromInventory(entry.price());
+        slotsChanged(inputs);
+    }
+
+    private void movePaymentFromInventory(Price price) {
+        ItemStack payment = inputs.getItem(PAYMENT_SLOT);
+        if (!payment.isEmpty()) {
+            if (!moveItemStackTo(payment, INVENTORY_START, HOTBAR_END, true)) {
+                return;
+            }
+            inputs.setItem(PAYMENT_SLOT, payment);
+        }
+        if (!inputs.getItem(PAYMENT_SLOT).isEmpty()) {
+            return;
+        }
+        for (int i = INVENTORY_START; i < HOTBAR_END; i++) {
+            ItemStack stack = slots.get(i).getItem();
+            ItemStack current = inputs.getItem(PAYMENT_SLOT);
+            if (stack.is(price.item()) && (current.isEmpty() || ItemStack.isSameItemSameComponents(stack, current))) {
+                int max = stack.getMaxStackSize();
+                int amount = Math.min(max - current.getCount(), stack.getCount());
+                ItemStack moved = stack.copyWithCount(current.getCount() + amount);
+                stack.shrink(amount);
+                inputs.setItem(PAYMENT_SLOT, moved);
+                if (moved.getCount() >= max) {
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -77,8 +144,21 @@ public class EnchantMenu extends AbstractContainerMenu {
         if (villager != null) {
             entries = EnchantEntries.forItem(inputs.getItem(INPUT_SLOT), villager.registryAccess());
             updateResult();
+            syncEntries(false);
         }
         super.slotsChanged(container);
+    }
+
+    private void syncEntries(boolean force) {
+        if (owner == null) {
+            return;
+        }
+        int selection = entries.indexOf(currentEntry());
+        if (force || selection != sentSelection || !entries.equals(sentEntries)) {
+            sentEntries = entries;
+            sentSelection = selection;
+            Services.PLATFORM.sendEntries(owner, new EnchantEntriesPayload(containerId, entries, selection));
+        }
     }
 
     private void updateResult() {
