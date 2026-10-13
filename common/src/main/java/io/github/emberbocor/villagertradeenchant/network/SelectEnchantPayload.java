@@ -1,25 +1,19 @@
 package io.github.emberbocor.villagertradeenchant.network;
 
 import io.github.emberbocor.villagertradeenchant.VillagerTradeEnchant;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.enchantment.Enchantment;
 
-public record SelectEnchantPayload(int containerId, ResourceKey<Enchantment> enchantment, int level) implements CustomPacketPayload {
-    public static final Type<SelectEnchantPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(VillagerTradeEnchant.MODID, "select_enchant"));
-    public static final StreamCodec<ByteBuf, SelectEnchantPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.VAR_INT, SelectEnchantPayload::containerId,
-            ResourceKey.streamCodec(Registries.ENCHANTMENT), SelectEnchantPayload::enchantment,
-            ByteBufCodecs.VAR_INT, SelectEnchantPayload::level,
-            SelectEnchantPayload::new);
+public record SelectEnchantPayload(int containerId, ResourceLocation enchantment, int level) {
+    public static final ResourceLocation ID = new ResourceLocation(VillagerTradeEnchant.MODID, "select_enchant");
 
-    @Override
-    public Type<SelectEnchantPayload> type() {
-        return TYPE;
+    public static SelectEnchantPayload read(FriendlyByteBuf buf) {
+        return new SelectEnchantPayload(buf.readVarInt(), buf.readResourceLocation(), buf.readVarInt());
+    }
+
+    public void write(FriendlyByteBuf buf) {
+        buf.writeVarInt(containerId);
+        buf.writeResourceLocation(enchantment);
+        buf.writeVarInt(level);
     }
 }

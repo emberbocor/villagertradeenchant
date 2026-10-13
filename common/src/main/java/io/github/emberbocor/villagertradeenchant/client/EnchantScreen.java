@@ -9,9 +9,11 @@ import io.github.emberbocor.villagertradeenchant.menu.EnchantMenu;
 import io.github.emberbocor.villagertradeenchant.network.SelectEnchantPayload;
 import io.github.emberbocor.villagertradeenchant.platform.ClientServices;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CyclingSlotBackground;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -20,16 +22,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 
 public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
-    private static final ResourceLocation BACKGROUND = ResourceLocation.withDefaultNamespace("textures/gui/container/villager.png");
-    private static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.withDefaultNamespace("container/villager/scroller");
-    private static final ResourceLocation SCROLLER_DISABLED_SPRITE = ResourceLocation.withDefaultNamespace("container/villager/scroller_disabled");
-    private static final ResourceLocation ROW_SPRITE = ResourceLocation.withDefaultNamespace("widget/button");
-    private static final ResourceLocation ROW_HIGHLIGHTED_SPRITE = ResourceLocation.withDefaultNamespace("widget/button_highlighted");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation("textures/gui/container/villager2.png");
     private static final List<ResourceLocation> INPUT_SLOT_ICONS = List.of(
-            ResourceLocation.withDefaultNamespace("item/empty_slot_sword"),
-            ResourceLocation.withDefaultNamespace("item/empty_slot_pickaxe"),
-            ResourceLocation.withDefaultNamespace("item/empty_armor_slot_chestplate"),
-            ResourceLocation.fromNamespaceAndPath(VillagerTradeEnchant.MODID, "item/empty_slot_book"));
+            new ResourceLocation("item/empty_slot_sword"),
+            new ResourceLocation("item/empty_slot_pickaxe"),
+            new ResourceLocation("item/empty_armor_slot_chestplate"),
+            new ResourceLocation(VillagerTradeEnchant.MODID, "item/empty_slot_book"));
     private static final Component ENCHANTMENTS_LABEL = Component.translatable("container." + VillagerTradeEnchant.MODID + ".enchantments");
     private static final Component PUT_ITEM_HINT = Component.translatable("container." + VillagerTradeEnchant.MODID + ".put_item");
     private static final Component NO_ENCHANTMENTS_HINT = Component.translatable("container." + VillagerTradeEnchant.MODID + ".no_enchantments");
@@ -46,6 +44,9 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
     private static final int SCROLL_BAR_HEIGHT = 139;
     private static final int SCROLLER_WIDTH = 6;
     private static final int SCROLLER_HEIGHT = 27;
+    private static final float SCROLLER_V = 199.0F;
+    private static final int ROW_V = 66;
+    private static final int ROW_HIGHLIGHTED_V = 86;
 
     private final CyclingSlotBackground inputSlotIcon = new CyclingSlotBackground(EnchantMenu.INPUT_SLOT);
     private List<EnchantEntry> shownEntries = List.of();
@@ -110,7 +111,8 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
             int x = leftPos + LIST_X;
             int y = topPos + LIST_Y + row * ROW_HEIGHT;
             boolean highlighted = index == hoveredRow || selected != null && enchantRow.entry().isSameOption(selected);
-            guiGraphics.blitSprite(highlighted ? ROW_HIGHLIGHTED_SPRITE : ROW_SPRITE, x, y, ROW_WIDTH, ROW_HEIGHT);
+            guiGraphics.blitNineSliced(AbstractWidget.WIDGETS_LOCATION, x, y, ROW_WIDTH, ROW_HEIGHT, 20, 4, 200, 20, 0,
+                    highlighted ? ROW_HIGHLIGHTED_V : ROW_V);
             guiGraphics.drawString(font, enchantRow.fit(font, NAME_WIDTH), x + NAME_X, y + 6, 0xFFFFFFFF, true);
             guiGraphics.renderFakeItem(enchantRow.price(), x + PRICE_X, y + 2);
             guiGraphics.renderItemDecorations(font, enchantRow.price(), x + PRICE_X, y + 2);
@@ -123,9 +125,9 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
         int hidden = rows.size() - VISIBLE_ROWS;
         if (hidden > 0) {
             int offset = scrollOff * (SCROLL_BAR_HEIGHT - SCROLLER_HEIGHT + 1) / hidden;
-            guiGraphics.blitSprite(SCROLLER_SPRITE, x, y + offset, SCROLLER_WIDTH, SCROLLER_HEIGHT);
+            guiGraphics.blit(BACKGROUND, x, y + offset, 0, 0.0F, SCROLLER_V, SCROLLER_WIDTH, SCROLLER_HEIGHT, 512, 256);
         } else {
-            guiGraphics.blitSprite(SCROLLER_DISABLED_SPRITE, x, y, SCROLLER_WIDTH, SCROLLER_HEIGHT);
+            guiGraphics.blit(BACKGROUND, x, y, 0, SCROLLER_WIDTH, SCROLLER_V, SCROLLER_WIDTH, SCROLLER_HEIGHT, 512, 256);
         }
     }
 
@@ -185,11 +187,12 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
     }
 
     private void select(EnchantEntry entry) {
-        entry.enchantment().unwrapKey().ifPresent(key -> {
+        ResourceLocation key = BuiltInRegistries.ENCHANTMENT.getKey(entry.enchantment());
+        if (key != null) {
             minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             menu.select(key, entry.level());
             ClientServices.PLATFORM.sendSelection(new SelectEnchantPayload(menu.containerId, key, entry.level()));
-        });
+        }
     }
 
     @Override
@@ -205,9 +208,9 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
         if (canScroll()) {
-            scrollOff = Mth.clamp((int) (scrollOff - scrollY), 0, rows.size() - VISIBLE_ROWS);
+            scrollOff = Mth.clamp((int) (scrollOff - delta), 0, rows.size() - VISIBLE_ROWS);
         }
         return true;
     }

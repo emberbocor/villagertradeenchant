@@ -11,7 +11,8 @@ import io.github.emberbocor.villagertradeenchant.enchant.EnchantEntry;
 import io.github.emberbocor.villagertradeenchant.network.EnchantEntriesPayload;
 import io.github.emberbocor.villagertradeenchant.platform.Services;
 import io.github.emberbocor.villagertradeenchant.villager.EnchanterProfession;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -25,7 +26,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
 
 public class EnchantMenu extends AbstractContainerMenu {
     public static final int INPUT_SLOT = 0;
@@ -98,9 +98,9 @@ public class EnchantMenu extends AbstractContainerMenu {
         this.selected = selection >= 0 && selection < entries.size() ? entries.get(selection) : null;
     }
 
-    public void select(ResourceKey<Enchantment> enchantment, int level) {
+    public void select(ResourceLocation enchantment, int level) {
         EnchantEntry entry = entries.stream()
-                .filter(candidate -> candidate.enchantment().is(enchantment) && candidate.level() == level)
+                .filter(candidate -> enchantment.equals(BuiltInRegistries.ENCHANTMENT.getKey(candidate.enchantment())) && candidate.level() == level)
                 .findFirst()
                 .orElse(null);
         if (entry == null) {
@@ -126,7 +126,7 @@ public class EnchantMenu extends AbstractContainerMenu {
         for (int i = INVENTORY_START; i < HOTBAR_END; i++) {
             ItemStack stack = slots.get(i).getItem();
             ItemStack current = inputs.getItem(PAYMENT_SLOT);
-            if (stack.is(price.item()) && (current.isEmpty() || ItemStack.isSameItemSameComponents(stack, current))) {
+            if (stack.is(price.item()) && (current.isEmpty() || ItemStack.isSameItemSameTags(stack, current))) {
                 int max = stack.getMaxStackSize();
                 int amount = Math.min(max - current.getCount(), stack.getCount());
                 ItemStack moved = stack.copyWithCount(current.getCount() + amount);
@@ -142,7 +142,7 @@ public class EnchantMenu extends AbstractContainerMenu {
     @Override
     public void slotsChanged(Container container) {
         if (villager != null) {
-            entries = EnchantEntries.forItem(inputs.getItem(INPUT_SLOT), villager.registryAccess());
+            entries = EnchantEntries.forItem(inputs.getItem(INPUT_SLOT));
             updateResult();
             syncEntries(false);
         }

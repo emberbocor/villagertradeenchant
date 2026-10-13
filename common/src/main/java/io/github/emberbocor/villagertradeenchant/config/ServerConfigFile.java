@@ -11,7 +11,6 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 
 import io.github.emberbocor.villagertradeenchant.VillagerTradeEnchant;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.enchantment.Enchantment;
 
@@ -46,7 +45,7 @@ final class ServerConfigFile {
     private ServerConfigFile() {
     }
 
-    static Optional<UnmodifiableConfig> load(Path file, List<? extends Holder.Reference<Enchantment>> enchantments) {
+    static Optional<UnmodifiableConfig> load(Path file, List<Enchantment> enchantments) {
         if (!Files.exists(file)) {
             String text = HEADER + tables(enchantments, "\n");
             write(file, text);
@@ -71,7 +70,7 @@ final class ServerConfigFile {
             VillagerTradeEnchant.LOGGER.warn("'prices' in {} is not a table, new enchantments are not added", file);
             return config;
         }
-        List<? extends Holder.Reference<Enchantment>> missing = enchantments.stream()
+        List<Enchantment> missing = enchantments.stream()
                 .filter(enchantment -> prices == null || !((UnmodifiableConfig) prices).contains(List.of(id(enchantment))))
                 .toList();
         if (missing.isEmpty()) {
@@ -112,13 +111,12 @@ final class ServerConfigFile {
         }
     }
 
-    private static String tables(List<? extends Holder.Reference<Enchantment>> enchantments, String newline) {
+    private static String tables(List<Enchantment> enchantments, String newline) {
         StringBuilder text = new StringBuilder();
-        for (Holder.Reference<Enchantment> enchantment : enchantments) {
+        for (Enchantment enchantment : enchantments) {
             text.append(newline).append("[prices.\"").append(id(enchantment)).append("\"]").append(newline);
             text.append("enabled = true").append(newline);
-            Enchantment value = enchantment.value();
-            for (int level = value.getMinLevel(); level <= value.getMaxLevel(); level++) {
+            for (int level = enchantment.getMinLevel(); level <= enchantment.getMaxLevel(); level++) {
                 Price price = DefaultPrices.of(enchantment, level);
                 text.append("levels.\"").append(level).append("\" = { item = \"")
                         .append(BuiltInRegistries.ITEM.getKey(price.item()))
@@ -128,7 +126,7 @@ final class ServerConfigFile {
         return text.toString();
     }
 
-    static String id(Holder.Reference<Enchantment> enchantment) {
-        return enchantment.key().location().toString();
+    static String id(Enchantment enchantment) {
+        return BuiltInRegistries.ENCHANTMENT.getKey(enchantment).toString();
     }
 }

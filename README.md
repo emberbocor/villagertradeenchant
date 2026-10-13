@@ -4,7 +4,7 @@ A villager who enchants your gear, at a price you control.
 
 Villager Trade Enchant adds a new villager profession, the **Enchanter**, whose job site is the enchanting table. Instead of trading, the Enchanter opens an enchant screen: put an item in, pick the exact enchantment and level you want, pay and take the enchanted item. No lapis, no experience levels, no random rolls.
 
-Available for NeoForge, Forge and Fabric.
+Available for Forge (also runs on NeoForge 1.20.1) and Fabric.
 
 ## Features
 
@@ -39,16 +39,16 @@ Items left in the slots go back to your inventory when you close the screen.
 
 ## Requirements
 
-| | NeoForge | Forge | Fabric |
-|---|---|---|---|
-| Minecraft | 1.21.1 | 1.21.1 | 1.21 or 1.21.1 |
-| Loader | NeoForge 21.1.4 or newer | Forge 52.0.0 or newer | Fabric Loader 0.15.11 or newer |
-| Other | | | Fabric API 0.102.0 or newer |
-| Jar | `villagertradeenchant-neoforge-1.21.1-<version>.jar` | `villagertradeenchant-forge-1.21.1-<version>.jar` | `villagertradeenchant-fabric-1.21-1.21.1-<version>.jar` |
+| | Forge / NeoForge | Fabric |
+|---|---|---|
+| Minecraft | 1.20.1 | 1.20 or 1.20.1 |
+| Loader | Forge 47.1.0 or newer, or NeoForge 1.20.1 (47.1.x) | Fabric Loader 0.14.21 or newer |
+| Other | | Fabric API 0.83.0 or newer |
+| Jar | `villagertradeenchant-forge-1.20.1-<version>.jar` | `villagertradeenchant-fabric-1.20-1.20.1-<version>.jar` |
 
-On Minecraft 1.21.1, NeoForge and Forge are separate loaders that do not run each other's mods, so each has its own jar. Pick the jar that matches your loader.
+On Minecraft 1.20.1, NeoForge still runs Forge mods, so the Forge jar is used for both.
 
-The Fabric jar bundles [NightConfig](https://github.com/TheElectronWill/night-config) (core and toml, LGPL-3.0) to read the TOML config. NeoForge and Forge already ship it.
+The Fabric jar bundles [NightConfig](https://github.com/TheElectronWill/night-config) 3.6.4 (core and toml, LGPL-3.0) to read the TOML config. Forge and NeoForge already ship it.
 
 ### Client and server
 
@@ -98,6 +98,8 @@ Default prices: `ceil(1.5 * (2 + 3 * level + (5 + 10 * level) / 2))` emeralds, d
 
 Your edits are never overwritten. When new enchantments appear (a new mod or datapack), only their tables are added at the end of the file; everything else, including your comments, stays exactly as it is. To hide an enchantment, set `enabled = false` instead of deleting its table, because a deleted table is added back with default prices on the next start.
 
+A config file can be copied between Minecraft versions. Enchantments that do not exist in this version are skipped with a warning; the others keep their settings.
+
 Mistakes do not crash the server. Unknown items or enchantments, levels outside an enchantment's range and invalid counts are skipped with a warning in the log, and the default price is used for those levels. If the file cannot be read at all (for example a TOML syntax error), default prices are used, the file is left untouched and the log says why.
 
 ## Removing the mod
@@ -108,17 +110,17 @@ The world still opens without crashing. Enchanters lose their profession and bec
 
 ### Incompatible mods
 
-A block can be the job site of only one villager profession, so mods that also make the enchanting table a job site cannot run together with this mod. NeoForge and Fabric show a clear error message at startup instead of crashing. Forge 1.21.1 cannot declare incompatible mods, so on Forge the game stops at startup with the error below instead.
+A block can be the job site of only one villager profession, so mods that also make the enchanting table a job site cannot run together with this mod. With the mods listed below, the game shows a clear error message at startup instead of crashing: on Forge and NeoForge the "Error loading mods" screen says "Mod villagertradeenchant only supports villager_enchanter below 0" (which means not at all), on Fabric the loader reports that the two mods are incompatible.
 
 | Mod | Mod ID | Reason |
 |---|---|---|
 | [Villager Enchanter](https://www.curseforge.com/minecraft/mc-mods/villager-enchanter) (Forge/Fabric, up to Minecraft 1.20.2) | `villager_enchanter` | Uses the enchanting table as the job site of its own Enchanter |
 
-Any other mod that registers the enchanting table as a job site clashes the same way; the game then stops at startup with an error like "Point of interest types ... both list ... in their blockstates" (NeoForge and Forge) or "... is defined in more than one PoI type" (Fabric).
+Any other mod that registers the enchanting table as a job site clashes the same way; the game then stops at startup with an error like "Point of interest types ... both list ... in their blockstates" (Forge and NeoForge) or "... is defined in more than one PoI type" (Fabric).
 
 ### Other mods
 
-- **Villager Trade Peek, Villager Trade Swap, Villager Trade Labels:** work together. The enchant screen is its own screen, not the trading screen, so those mods leave it alone.
+- **Villager Trade Peek, Villager Trade Swap, Villager Trade Labels (1.20.1):** work together. The enchant screen is its own screen, not the trading screen, so those mods leave it alone.
 - Enchantments added by other mods or datapacks are supported and appear in the config automatically.
 - Trades added to the Enchanter by other mods are ignored; the Enchanter never trades.
 
@@ -128,7 +130,7 @@ Any other mod that registers the enchanting table as a job site clashes the same
 ./gradlew build
 ```
 
-The jars are written to `neoforge/build/libs/`, `forge/build/libs/` and `fabric/build/libs/`.
+The jars are written to `forge/build/libs/` and `fabric/build/libs/`.
 
 ## License
 

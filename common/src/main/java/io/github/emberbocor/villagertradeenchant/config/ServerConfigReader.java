@@ -16,12 +16,11 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import io.github.emberbocor.villagertradeenchant.VillagerTradeEnchant;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 
@@ -35,15 +34,15 @@ final class ServerConfigReader {
         this.file = file;
     }
 
-    ServerConfig.Settings read(@Nullable UnmodifiableConfig config, List<Holder.Reference<Enchantment>> enchantments) {
+    ServerConfig.Settings read(@Nullable UnmodifiableConfig config, List<Enchantment> enchantments) {
         double multiplier = config == null ? 1.0 : multiplier(config);
         boolean allowConflicts = config != null && bool(config, "allowConflicts", false);
         boolean allowBooks = config == null || bool(config, "allowBooks", true);
         Map<String, UnmodifiableConfig> tables = config == null ? Map.of() : tables(config, enchantments);
 
-        Map<ResourceKey<Enchantment>, ServerConfig.EnchantmentPrices> prices = new HashMap<>();
-        for (Holder.Reference<Enchantment> enchantment : enchantments) {
-            prices.put(enchantment.key(), prices(enchantment, tables.get(ServerConfigFile.id(enchantment)), multiplier));
+        Map<Enchantment, ServerConfig.EnchantmentPrices> prices = new HashMap<>();
+        for (Enchantment enchantment : enchantments) {
+            prices.put(enchantment, prices(enchantment, tables.get(ServerConfigFile.id(enchantment)), multiplier));
         }
         if (cappedPrices > 0) {
             VillagerTradeEnchant.LOGGER.warn("{}: {} prices went above the limit with priceMultiplier {} and were capped at 64 (or the item's max stack size)",
@@ -76,7 +75,7 @@ final class ServerConfigReader {
         return fallback;
     }
 
-    private Map<String, UnmodifiableConfig> tables(UnmodifiableConfig config, List<Holder.Reference<Enchantment>> enchantments) {
+    private Map<String, UnmodifiableConfig> tables(UnmodifiableConfig config, List<Enchantment> enchantments) {
         if (!(config.get("prices") instanceof UnmodifiableConfig prices)) {
             return Map.of();
         }
@@ -95,14 +94,13 @@ final class ServerConfigReader {
         return tables;
     }
 
-    private ServerConfig.EnchantmentPrices prices(Holder.Reference<Enchantment> enchantment, @Nullable UnmodifiableConfig table, double multiplier) {
+    private ServerConfig.EnchantmentPrices prices(Enchantment enchantment, @Nullable UnmodifiableConfig table, double multiplier) {
         String id = ServerConfigFile.id(enchantment);
         boolean enabled = table == null || enabled(id, table);
         Int2ObjectMap<Price> configured = table == null ? new Int2ObjectOpenHashMap<>() : levels(enchantment, table);
 
         Int2ObjectMap<Price> levels = new Int2ObjectOpenHashMap<>();
-        Enchantment value = enchantment.value();
-        for (int level = value.getMinLevel(); level <= value.getMaxLevel(); level++) {
+        for (int level = enchantment.getMinLevel(); level <= enchantment.getMaxLevel(); level++) {
             Price price = configured.get(level);
             levels.put(level, multiply(price != null ? price : DefaultPrices.of(enchantment, level), multiplier));
         }
@@ -121,7 +119,7 @@ final class ServerConfigReader {
         return true;
     }
 
-    private Int2ObjectMap<Price> levels(Holder.Reference<Enchantment> enchantment, UnmodifiableConfig table) {
+    private Int2ObjectMap<Price> levels(Enchantment enchantment, UnmodifiableConfig table) {
         String id = ServerConfigFile.id(enchantment);
         Int2ObjectMap<Price> levels = new Int2ObjectOpenHashMap<>();
         Object value = table.get("levels");
@@ -132,8 +130,8 @@ final class ServerConfigReader {
             warn("prices.\"{}\".levels must be a table, using default prices", id);
             return levels;
         }
-        int min = enchantment.value().getMinLevel();
-        int max = enchantment.value().getMaxLevel();
+        int min = enchantment.getMinLevel();
+        int max = enchantment.getMaxLevel();
         for (UnmodifiableConfig.Entry entry : entries.entrySet()) {
             Integer level = parseLevel(entry.getKey());
             if (level == null || level < min || level > max) {
@@ -170,10 +168,11 @@ final class ServerConfigReader {
             return Optional.empty();
         }
         int amount = ((Number) count).intValue();
-        if (amount > item.getDefaultMaxStackSize()) {
+        int maxStackSize = maxStackSize(item);
+        if (amount > maxStackSize) {
             warn("count {} for level {} of {} is above the max stack size of {}, using {}",
-                    amount, level, id, BuiltInRegistries.ITEM.getKey(item), item.getDefaultMaxStackSize());
-            amount = item.getDefaultMaxStackSize();
+                    amount, level, id, BuiltInRegistries.ITEM.getKey(item), maxStackSize);
+            amount = maxStackSize;
         }
         return Optional.of(new Price(item, amount));
     }
@@ -184,8 +183,12 @@ final class ServerConfigReader {
         return id == null ? null : BuiltInRegistries.ITEM.getOptional(id).filter(item -> item != Items.AIR).orElse(null);
     }
 
+    private static int maxStackSize(Item item) {
+        return new ItemStack(item).getMaxStackSize();
+    }
+
     private Price multiply(Price price, double multiplier) {
-        int limit = Math.min(MAX_COUNT, price.item().getDefaultMaxStackSize());
+        int limit = Math.min(MAX_COUNT, maxStackSize(price.item()));
         int count = Mth.ceil(price.count() * multiplier);
         if (count > limit) {
             cappedPrices++;

@@ -7,15 +7,12 @@ import java.util.Optional;
 import io.github.emberbocor.villagertradeenchant.enchant.EnchantEntry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.core.Holder;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -24,11 +21,11 @@ record EnchantRow(EnchantEntry entry, Component name, Component suffix, ItemStac
     private static final String ELLIPSIS = "…";
 
     static EnchantRow of(EnchantEntry entry) {
-        Holder<Enchantment> enchantment = entry.enchantment();
-        MutableComponent name = enchantment.value().description().copy();
-        ComponentUtils.mergeStyles(name, Style.EMPTY.withColor(enchantment.is(EnchantmentTags.CURSE) ? ChatFormatting.RED : ChatFormatting.WHITE));
+        Enchantment enchantment = entry.enchantment();
+        MutableComponent name = Component.translatable(enchantment.getDescriptionId())
+                .withStyle(enchantment.isCurse() ? ChatFormatting.RED : ChatFormatting.WHITE);
         MutableComponent suffix = Component.empty();
-        if (entry.level() != 1 || enchantment.value().getMaxLevel() != 1) {
+        if (entry.level() != 1 || enchantment.getMaxLevel() != 1) {
             suffix.append(Component.empty()
                     .withStyle(name.getStyle())
                     .append(CommonComponents.SPACE)
@@ -64,12 +61,12 @@ record EnchantRow(EnchantEntry entry, Component name, Component suffix, ItemStac
             segments.add(new Segment(style, content));
             return Optional.empty();
         }, Style.EMPTY);
-        while (!segments.isEmpty() && segments.getLast().content().isBlank()) {
-            segments.removeLast();
+        while (!segments.isEmpty() && segments.get(segments.size() - 1).content().isBlank()) {
+            segments.remove(segments.size() - 1);
         }
         if (!segments.isEmpty()) {
-            Segment last = segments.removeLast();
-            segments.add(new Segment(last.style(), last.content().stripTrailing()));
+            Segment last = segments.get(segments.size() - 1);
+            segments.set(segments.size() - 1, new Segment(last.style(), last.content().stripTrailing()));
         }
         return FormattedText.composite(segments.stream().map(segment -> FormattedText.of(segment.content(), segment.style())).toList());
     }

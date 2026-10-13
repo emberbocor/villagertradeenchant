@@ -17,7 +17,7 @@ public class VillagerTradeEnchantForge {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         ForgeContent.register(modEventBus);
         ForgeNetwork.register();
-        MinecraftForge.EVENT_BUS.addListener((ServerAboutToStartEvent event) -> ServerConfig.load(event.getServer().registryAccess()));
+        MinecraftForge.EVENT_BUS.addListener((ServerAboutToStartEvent event) -> ServerConfig.load());
         if (FMLEnvironment.dist == Dist.CLIENT) {
             VillagerTradeEnchantForgeClient.register(modEventBus);
         }

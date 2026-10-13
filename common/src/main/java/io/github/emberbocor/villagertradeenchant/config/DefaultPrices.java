@@ -1,7 +1,5 @@
 package io.github.emberbocor.villagertradeenchant.config;
 
-import net.minecraft.core.Holder;
-import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -12,9 +10,9 @@ final class DefaultPrices {
     private DefaultPrices() {
     }
 
-    static Price of(Holder<Enchantment> enchantment, int level) {
+    static Price of(Enchantment enchantment, int level) {
         int emeralds = Mth.ceil(1.5 * (2 + 3 * level + (5 + 10 * level) / 2.0));
-        if (enchantment.is(EnchantmentTags.TREASURE)) {
+        if (enchantment.isTreasureOnly()) {
             emeralds *= 2;
         }
         if (emeralds <= MAX_EMERALDS) {

@@ -9,10 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import io.github.emberbocor.villagertradeenchant.platform.Services;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 public final class ServerConfig {
@@ -21,8 +18,8 @@ public final class ServerConfig {
     private ServerConfig() {
     }
 
-    public static void load(RegistryAccess registries) {
-        List<Holder.Reference<Enchantment>> enchantments = registries.registryOrThrow(Registries.ENCHANTMENT).holders()
+    public static void load() {
+        List<Enchantment> enchantments = BuiltInRegistries.ENCHANTMENT.stream()
                 .sorted(Comparator.comparing(ServerConfigFile::id))
                 .toList();
         Path file = Services.PLATFORM.getConfigDirectory().resolve(ServerConfigFile.FILE_NAME);
@@ -37,23 +34,18 @@ public final class ServerConfig {
         return settings.allowBooks();
     }
 
-    public static boolean isEnabled(Holder<Enchantment> enchantment) {
-        EnchantmentPrices prices = prices(enchantment);
+    public static boolean isEnabled(Enchantment enchantment) {
+        EnchantmentPrices prices = settings.enchantments().get(enchantment);
         return prices != null && prices.enabled();
     }
 
     @Nullable
-    public static Price price(Holder<Enchantment> enchantment, int level) {
-        EnchantmentPrices prices = prices(enchantment);
+    public static Price price(Enchantment enchantment, int level) {
+        EnchantmentPrices prices = settings.enchantments().get(enchantment);
         return prices == null ? null : prices.levels().get(level);
     }
 
-    @Nullable
-    private static EnchantmentPrices prices(Holder<Enchantment> enchantment) {
-        return enchantment.unwrapKey().map(settings.enchantments()::get).orElse(null);
-    }
-
-    record Settings(boolean allowConflicts, boolean allowBooks, Map<ResourceKey<Enchantment>, EnchantmentPrices> enchantments) {
+    record Settings(boolean allowConflicts, boolean allowBooks, Map<Enchantment, EnchantmentPrices> enchantments) {
     }
 
     record EnchantmentPrices(boolean enabled, Int2ObjectMap<Price> levels) {

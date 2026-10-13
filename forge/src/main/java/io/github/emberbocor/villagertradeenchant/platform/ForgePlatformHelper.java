@@ -6,7 +6,6 @@ import io.github.emberbocor.villagertradeenchant.ForgeContent;
 import io.github.emberbocor.villagertradeenchant.menu.EnchantMenu;
 import io.github.emberbocor.villagertradeenchant.network.EnchantEntriesPayload;
 import io.github.emberbocor.villagertradeenchant.network.ForgeNetwork;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.inventory.MenuType;
@@ -31,8 +30,8 @@ public final class ForgePlatformHelper implements PlatformHelper {
     }
 
     @Override
-    public boolean canApply(ItemStack stack, Holder<Enchantment> enchantment) {
-        return enchantment.value().canEnchant(stack);
+    public boolean canApply(ItemStack stack, Enchantment enchantment) {
+        return enchantment.canEnchant(stack);
     }
 
     @Override

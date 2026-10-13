@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class EnchanterProfession {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VillagerTradeEnchant.MODID, "enchanter");
+    public static final ResourceLocation ID = new ResourceLocation(VillagerTradeEnchant.MODID, "enchanter");
     public static final ResourceKey<PoiType> POI = ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, ID);
     public static final int MAX_TICKETS = 1;
     public static final int VALID_RANGE = 1;

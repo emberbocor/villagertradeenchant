@@ -21,6 +21,6 @@ public final class FabricContent {
         PointOfInterestHelper.register(EnchanterProfession.ID, EnchanterProfession.MAX_TICKETS, EnchanterProfession.VALID_RANGE,
                 EnchanterProfession.jobSiteStates());
         Registry.register(BuiltInRegistries.VILLAGER_PROFESSION, EnchanterProfession.ID, ENCHANTER);
-        Registry.register(BuiltInRegistries.MENU, ResourceLocation.fromNamespaceAndPath(VillagerTradeEnchant.MODID, "enchant"), ENCHANT_MENU);
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(VillagerTradeEnchant.MODID, "enchant"), ENCHANT_MENU);
     }
 }

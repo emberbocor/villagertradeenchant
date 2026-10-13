@@ -11,6 +11,9 @@ public class VillagerTradeEnchantFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         MenuScreens.register(FabricContent.ENCHANT_MENU, EnchantScreen::new);
-        ClientPlayNetworking.registerGlobalReceiver(EnchantEntriesPayload.TYPE, (payload, context) -> ClientPayloadHandler.handleEntries(payload));
+        ClientPlayNetworking.registerGlobalReceiver(EnchantEntriesPayload.ID, (client, handler, buf, responseSender) -> {
+            EnchantEntriesPayload payload = EnchantEntriesPayload.read(buf);
+            client.execute(() -> ClientPayloadHandler.handleEntries(payload));
+        });
     }
 }

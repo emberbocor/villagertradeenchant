@@ -5,10 +5,10 @@ import java.nio.file.Path;
 import io.github.emberbocor.villagertradeenchant.FabricContent;
 import io.github.emberbocor.villagertradeenchant.menu.EnchantMenu;
 import io.github.emberbocor.villagertradeenchant.network.EnchantEntriesPayload;
-import net.fabricmc.fabric.api.item.v1.EnchantingContext;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.core.Holder;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.inventory.MenuType;
@@ -32,12 +32,14 @@ public final class FabricPlatformHelper implements PlatformHelper {
     }
 
     @Override
-    public boolean canApply(ItemStack stack, Holder<Enchantment> enchantment) {
-        return stack.canBeEnchantedWith(enchantment, EnchantingContext.ACCEPTABLE);
+    public boolean canApply(ItemStack stack, Enchantment enchantment) {
+        return enchantment.canEnchant(stack);
     }
 
     @Override
     public void sendEntries(ServerPlayer player, EnchantEntriesPayload payload) {
-        ServerPlayNetworking.send(player, payload);
+        FriendlyByteBuf buf = PacketByteBufs.create();
+        payload.write(buf);
+        ServerPlayNetworking.send(player, EnchantEntriesPayload.ID, buf);
     }
 }
