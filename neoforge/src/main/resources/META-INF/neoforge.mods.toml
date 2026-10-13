@@ -29,3 +29,10 @@ config="${mod_id}.mixins.json"
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="villager_enchanter"
+    type="incompatible"
+    reason="Villager Enchanter also uses the enchanting table as a villager job site. A block can only be the job site of one profession."
+    ordering="NONE"
+    side="BOTH"

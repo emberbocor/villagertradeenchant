@@ -153,7 +153,8 @@ public class EnchantMenu extends AbstractContainerMenu {
         if (owner == null) {
             return;
         }
-        int selection = entries.indexOf(currentEntry());
+        EnchantEntry current = currentEntry();
+        int selection = current == null ? -1 : entries.indexOf(current);
         if (force || selection != sentSelection || !entries.equals(sentEntries)) {
             sentEntries = entries;
             sentSelection = selection;

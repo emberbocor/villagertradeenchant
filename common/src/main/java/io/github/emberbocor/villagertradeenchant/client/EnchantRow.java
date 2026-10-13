@@ -26,7 +26,7 @@ record EnchantRow(EnchantEntry entry, Component name, Component suffix, ItemStac
     static EnchantRow of(EnchantEntry entry) {
         Holder<Enchantment> enchantment = entry.enchantment();
         MutableComponent name = enchantment.value().description().copy();
-        ComponentUtils.mergeStyles(name, Style.EMPTY.withColor(enchantment.is(EnchantmentTags.CURSE) ? ChatFormatting.RED : ChatFormatting.GRAY));
+        ComponentUtils.mergeStyles(name, Style.EMPTY.withColor(enchantment.is(EnchantmentTags.CURSE) ? ChatFormatting.RED : ChatFormatting.WHITE));
         MutableComponent suffix = Component.empty();
         if (entry.level() != 1 || enchantment.value().getMaxLevel() != 1) {
             suffix.append(Component.empty()

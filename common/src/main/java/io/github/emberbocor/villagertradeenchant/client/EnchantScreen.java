@@ -10,6 +10,7 @@ import io.github.emberbocor.villagertradeenchant.network.SelectEnchantPayload;
 import io.github.emberbocor.villagertradeenchant.platform.ClientServices;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CyclingSlotBackground;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -24,6 +25,11 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
     private static final ResourceLocation SCROLLER_DISABLED_SPRITE = ResourceLocation.withDefaultNamespace("container/villager/scroller_disabled");
     private static final ResourceLocation ROW_SPRITE = ResourceLocation.withDefaultNamespace("widget/button");
     private static final ResourceLocation ROW_HIGHLIGHTED_SPRITE = ResourceLocation.withDefaultNamespace("widget/button_highlighted");
+    private static final List<ResourceLocation> INPUT_SLOT_ICONS = List.of(
+            ResourceLocation.withDefaultNamespace("item/empty_slot_sword"),
+            ResourceLocation.withDefaultNamespace("item/empty_slot_pickaxe"),
+            ResourceLocation.withDefaultNamespace("item/empty_armor_slot_chestplate"),
+            ResourceLocation.fromNamespaceAndPath(VillagerTradeEnchant.MODID, "item/empty_slot_book"));
     private static final Component ENCHANTMENTS_LABEL = Component.translatable("container." + VillagerTradeEnchant.MODID + ".enchantments");
     private static final Component PUT_ITEM_HINT = Component.translatable("container." + VillagerTradeEnchant.MODID + ".put_item");
     private static final Component NO_ENCHANTMENTS_HINT = Component.translatable("container." + VillagerTradeEnchant.MODID + ".no_enchantments");
@@ -41,6 +47,7 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
     private static final int SCROLLER_WIDTH = 6;
     private static final int SCROLLER_HEIGHT = 27;
 
+    private final CyclingSlotBackground inputSlotIcon = new CyclingSlotBackground(EnchantMenu.INPUT_SLOT);
     private List<EnchantEntry> shownEntries = List.of();
     private List<EnchantRow> rows = List.of();
     private int scrollOff;
@@ -50,6 +57,12 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
         super(menu, inventory, title);
         imageWidth = 276;
         inventoryLabelX = 107;
+    }
+
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+        inputSlotIcon.tick(INPUT_SLOT_ICONS);
     }
 
     @Override
@@ -83,6 +96,7 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         guiGraphics.blit(BACKGROUND, leftPos, topPos, 0, 0.0F, 0.0F, imageWidth, imageHeight, 512, 256);
+        inputSlotIcon.render(menu, guiGraphics, partialTick, leftPos, topPos);
         renderScroller(guiGraphics);
         if (rows.isEmpty()) {
             renderHint(guiGraphics);
