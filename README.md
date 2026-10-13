@@ -9,7 +9,7 @@ Available for NeoForge.
 ## Features
 
 - **New profession.** Unemployed villagers near an enchanting table become Enchanters, just like vanilla job sites. The Enchanter has its own look (a crimson robe and hood with a silver stripe and gold trim) for villagers and zombie villagers, and keeps its profession through zombification and curing.
-- **Pick exactly what you want.** The list shows one row per enchantment level (Sharpness I, Sharpness II, ...) that can go on the item, sorted by name, with its price next to it. Names use the vanilla tooltip colors; curses are red.
+- **Pick exactly what you want.** The list shows one row per enchantment level (Sharpness I, Sharpness II, ...) that can go on the item, sorted by name, with its price next to it. Names are white; curses are red.
 - **Anvil rules.** Only enchantments the item can take in an anvil are offered. Enchantments that conflict with one already on the item are hidden, and so are levels the item already has (or exceeds). Upgrading an enchantment costs the full price of the new level.
 - **Books too.** A plain book becomes an enchanted book; an enchanted book can get more enchantments. Books accept every enchantment.
 - **No rework penalty.** Enchanting here does not raise the item's anvil repair cost.
@@ -26,6 +26,8 @@ The Enchanter never trades, never levels up and gives no reputation or Hero of t
 3. Right-click it to open the enchant screen.
 
 Like any villager that has never traded, an Enchanter loses its profession when its enchanting table is broken, and can take another job site afterwards. Nitwits and baby villagers cannot become Enchanters.
+
+In a world that existed before the mod was installed, an enchanting table that was already placed may not be recognized as a job site yet. Break it and place it again.
 
 ## Using the enchant screen
 
@@ -92,6 +94,10 @@ Default prices: `ceil(1.5 * (2 + 3 * level + (5 + 10 * level) / 2))` emeralds, d
 Your edits are never overwritten. When new enchantments appear (a new mod or datapack), only their tables are added at the end of the file; everything else, including your comments, stays exactly as it is. To hide an enchantment, set `enabled = false` instead of deleting its table, because a deleted table is added back with default prices on the next start.
 
 Mistakes do not crash the server. Unknown items or enchantments, levels outside an enchantment's range and invalid counts are skipped with a warning in the log, and the default price is used for those levels. If the file cannot be read at all (for example a TOML syntax error), default prices are used, the file is left untouched and the log says why.
+
+## Removing the mod
+
+The world still opens without crashing. Enchanters lose their profession and become unemployed villagers, and enchantments already bought stay on the items.
 
 ## Compatibility
 

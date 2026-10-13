@@ -32,7 +32,7 @@ record EnchantRow(EnchantEntry entry, Component name, Component suffix, ItemStac
             suffix.append(Component.empty()
                     .withStyle(name.getStyle())
                     .append(CommonComponents.SPACE)
-                    .append(Component.translatable("enchantment.level." + entry.level())));
+                    .append(Component.translatableWithFallback("enchantment.level." + entry.level(), String.valueOf(entry.level()))));
         }
         return new EnchantRow(entry, name, suffix, new ItemStack(entry.price().item(), entry.price().count()));
     }
