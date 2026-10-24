@@ -18,8 +18,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -180,7 +180,7 @@ final class ServerConfigReader {
 
     @Nullable
     private static Item item(@Nullable Object value) {
-        ResourceLocation id = value instanceof String string ? ResourceLocation.tryParse(string) : null;
+        Identifier id = value instanceof String string ? Identifier.tryParse(string) : null;
         return id == null ? null : BuiltInRegistries.ITEM.getOptional(id).filter(item -> item != Items.AIR).orElse(null);
     }
 

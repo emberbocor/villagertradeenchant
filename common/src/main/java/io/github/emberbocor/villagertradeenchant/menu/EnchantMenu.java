@@ -18,7 +18,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -27,7 +27,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 
-public class EnchantMenu extends AbstractContainerMenu {
+public final class EnchantMenu extends AbstractContainerMenu {
     public static final int INPUT_SLOT = 0;
     public static final int PAYMENT_SLOT = 1;
     public static final int RESULT_SLOT = 2;
@@ -57,12 +57,7 @@ public class EnchantMenu extends AbstractContainerMenu {
         this.owner = villager != null && inventory.player instanceof ServerPlayer player ? player : null;
         inputs.addListener(this::slotsChanged);
 
-        addSlot(new Slot(inputs, INPUT_SLOT, 136, 37) {
-            @Override
-            public int getMaxStackSize() {
-                return 1;
-            }
-        });
+        addSlot(new InputSlot(136, 37));
         addSlot(new Slot(inputs, PAYMENT_SLOT, 162, 37));
         addSlot(new ResultSlot(220, 37));
         for (int row = 0; row < 3; row++) {
@@ -257,6 +252,17 @@ public class EnchantMenu extends AbstractContainerMenu {
                 villager.setTradingPlayer(null);
             }
             clearContainer(player, inputs);
+        }
+    }
+
+    private class InputSlot extends Slot {
+        InputSlot(int x, int y) {
+            super(inputs, INPUT_SLOT, x, y);
+        }
+
+        @Override
+        public int getMaxStackSize() {
+            return 1;
         }
     }
 

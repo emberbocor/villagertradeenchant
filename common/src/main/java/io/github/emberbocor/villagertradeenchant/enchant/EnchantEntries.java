@@ -30,7 +30,7 @@ public final class EnchantEntries {
 
         ItemEnchantments current = EnchantmentHelper.getEnchantmentsForCrafting(stack);
         List<EnchantEntry> entries = new ArrayList<>();
-        registries.registryOrThrow(Registries.ENCHANTMENT).holders().forEach(enchantment -> {
+        registries.lookupOrThrow(Registries.ENCHANTMENT).listElements().forEach(enchantment -> {
             if (!ServerConfig.isEnabled(enchantment) || !book && !Services.PLATFORM.canApply(stack, enchantment)) {
                 return;
             }

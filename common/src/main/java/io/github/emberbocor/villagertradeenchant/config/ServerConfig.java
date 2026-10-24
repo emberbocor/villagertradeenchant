@@ -22,7 +22,7 @@ public final class ServerConfig {
     }
 
     public static void load(RegistryAccess registries) {
-        List<Holder.Reference<Enchantment>> enchantments = registries.registryOrThrow(Registries.ENCHANTMENT).holders()
+        List<Holder.Reference<Enchantment>> enchantments = registries.lookupOrThrow(Registries.ENCHANTMENT).listElements()
                 .sorted(Comparator.comparing(ServerConfigFile::id))
                 .toList();
         Path file = Services.PLATFORM.getConfigDirectory().resolve(ServerConfigFile.FILE_NAME);

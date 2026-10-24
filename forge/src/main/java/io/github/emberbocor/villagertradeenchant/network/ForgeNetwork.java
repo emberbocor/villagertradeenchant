@@ -3,7 +3,7 @@ package io.github.emberbocor.villagertradeenchant.network;
 import io.github.emberbocor.villagertradeenchant.VillagerTradeEnchant;
 import io.github.emberbocor.villagertradeenchant.client.ClientPayloadHandler;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.Channel;
 import net.minecraftforge.network.ChannelBuilder;
@@ -18,7 +18,7 @@ public final class ForgeNetwork {
     }
 
     public static void register() {
-        channel = ChannelBuilder.named(ResourceLocation.fromNamespaceAndPath(VillagerTradeEnchant.MODID, "main"))
+        channel = ChannelBuilder.named(Identifier.fromNamespaceAndPath(VillagerTradeEnchant.MODID, "main"))
                 .networkProtocolVersion(PROTOCOL_VERSION)
                 .payloadChannel()
                 .play()

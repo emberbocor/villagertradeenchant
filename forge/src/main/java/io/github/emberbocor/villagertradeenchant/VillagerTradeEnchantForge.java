@@ -3,23 +3,21 @@ package io.github.emberbocor.villagertradeenchant;
 import io.github.emberbocor.villagertradeenchant.config.ServerConfig;
 import io.github.emberbocor.villagertradeenchant.network.ForgeNetwork;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mod(VillagerTradeEnchant.MODID)
 public class VillagerTradeEnchantForge {
-    @SuppressWarnings("removal")
-    public VillagerTradeEnchantForge() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        ForgeContent.register(modEventBus);
+    public VillagerTradeEnchantForge(FMLJavaModLoadingContext context) {
+        BusGroup modBusGroup = context.getModBusGroup();
+        ForgeContent.register(modBusGroup);
         ForgeNetwork.register();
-        MinecraftForge.EVENT_BUS.addListener((ServerAboutToStartEvent event) -> ServerConfig.load(event.getServer().registryAccess()));
+        ServerAboutToStartEvent.BUS.addListener(event -> ServerConfig.load(event.getServer().registryAccess()));
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            VillagerTradeEnchantForgeClient.register(modEventBus);
+            VillagerTradeEnchantForgeClient.register(modBusGroup);
         }
     }
 }

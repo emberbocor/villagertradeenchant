@@ -11,7 +11,7 @@ import io.github.emberbocor.villagertradeenchant.villager.EnchanterProfession;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 
@@ -42,6 +42,6 @@ public abstract class VillagerMixin {
             }
             EnchantMenu.open(player, villager);
         }
-        cir.setReturnValue(InteractionResult.sidedSuccess(villager.level().isClientSide()));
+        cir.setReturnValue(InteractionResult.SUCCESS);
     }
 }

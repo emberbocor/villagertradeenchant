@@ -1,11 +1,11 @@
 package io.github.emberbocor.villagertradeenchant.platform;
 
 import io.github.emberbocor.villagertradeenchant.network.SelectEnchantPayload;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 public final class NeoForgeClientPlatformHelper implements ClientPlatformHelper {
     @Override
     public void sendSelection(SelectEnchantPayload payload) {
-        PacketDistributor.sendToServer(payload);
+        ClientPacketDistributor.sendToServer(payload);
     }
 }

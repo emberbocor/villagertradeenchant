@@ -11,7 +11,7 @@ neoForge {
     }
     runs {
         configureEach {
-            gameDirectory = rootProject.file('run')
+            gameDirectory = rootProject.file('runs/1.21.11/neoforge')
             ideName = "NeoForge ${it.name.capitalize()} (${project.path})"
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
             systemProperty 'forge.logging.markers', 'REGISTRIES'

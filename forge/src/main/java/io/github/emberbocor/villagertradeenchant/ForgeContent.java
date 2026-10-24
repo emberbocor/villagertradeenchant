@@ -4,10 +4,10 @@ import io.github.emberbocor.villagertradeenchant.menu.EnchantMenu;
 import io.github.emberbocor.villagertradeenchant.villager.EnchanterProfession;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -26,9 +26,9 @@ public final class ForgeContent {
     private ForgeContent() {
     }
 
-    static void register(IEventBus modEventBus) {
-        POI_TYPES.register(modEventBus);
-        PROFESSIONS.register(modEventBus);
-        MENUS.register(modEventBus);
+    static void register(BusGroup modBusGroup) {
+        POI_TYPES.register(modBusGroup);
+        PROFESSIONS.register(modBusGroup);
+        MENUS.register(modBusGroup);
     }
 }

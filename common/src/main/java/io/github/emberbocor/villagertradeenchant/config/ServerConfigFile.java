@@ -129,6 +129,6 @@ final class ServerConfigFile {
     }
 
     static String id(Holder.Reference<Enchantment> enchantment) {
-        return enchantment.key().location().toString();
+        return enchantment.key().identifier().toString();
     }
 }
