@@ -41,12 +41,15 @@ Items left in the slots go back to your inventory when you close the screen.
 
 | | NeoForge | Forge | Fabric |
 |---|---|---|---|
-| Minecraft | 1.21.11 | 1.21.11 | 1.21.11 |
-| Loader | NeoForge 21.11.42 or newer | Forge 61.0.1 or newer | Fabric Loader 0.17.3 or newer |
-| Other | | | Fabric API 0.139.5 or newer |
-| Jar | `villagertradeenchant-neoforge-1.21.11-<version>.jar` | `villagertradeenchant-forge-1.21.11-<version>.jar` | `villagertradeenchant-fabric-1.21.11-<version>.jar` |
+| Minecraft | 26.1, 26.1.1 or 26.1.2 | 26.1, 26.1.1 or 26.1.2 | 26.1, 26.1.1 or 26.1.2 |
+| Java | 25 | 25 | 25 |
+| Loader | NeoForge 26.1.0.1-beta or newer | Forge 62.0.0 or newer | Fabric Loader 0.18.4 or newer |
+| Other | | | Fabric API 0.144.0 or newer |
+| Jar | `villagertradeenchant-neoforge-26.1-26.1.2-<version>.jar` | `villagertradeenchant-forge-26.1-26.1.2-<version>.jar` | `villagertradeenchant-fabric-26.1-26.1.2-<version>.jar` |
 
-On Minecraft 1.21.11, NeoForge and Forge are separate loaders that do not run each other's mods, so each has its own jar. Pick the jar that matches your loader.
+Minecraft 26.x needs Java 25. One jar per loader works on all three Minecraft versions. NeoForge only has beta builds for Minecraft 26.1 and 26.1.1; Forge uses the 62.x series for 26.1, 63.x for 26.1.1 and 64.x for 26.1.2.
+
+NeoForge and Forge are separate loaders that do not run each other's mods, so each has its own jar. Pick the jar that matches your loader.
 
 The Fabric jar bundles [NightConfig](https://github.com/TheElectronWill/night-config) (core and toml, LGPL-3.0) to read the TOML config. NeoForge and Forge already ship it.
 
@@ -100,9 +103,9 @@ Your edits are never overwritten. When new enchantments appear (a new mod or dat
 
 Mistakes do not crash the server. Unknown items or enchantments, levels outside an enchantment's range and invalid counts are skipped with a warning in the log, and the default price is used for those levels. If the file cannot be read at all (for example a TOML syntax error), default prices are used, the file is left untouched and the log says why.
 
-## Upgrading a world from Minecraft 1.21.1
+## Upgrading a world from Minecraft 1.21.11
 
-Worlds from Minecraft 1.21.1 with this mod open in 1.21.11 with the 1.21.11 jar of the same loader. Enchanters stay Enchanters (the profession and its job site keep the same ids) and keep their enchanting tables. The config file has the same format, so `config/villagertradeenchant-server.toml` can be kept as it is; enchantments that are new in 1.21.11 (Lunge) are added at the end on the first start.
+Worlds from Minecraft 1.21.11 with this mod open in 26.1 with the 26.1 jar of the same loader. Enchanters stay Enchanters (the profession and its job site keep the same ids) and keep their enchanting tables. The config file has the same format, so `config/villagertradeenchant-server.toml` can be kept as it is.
 
 ## Removing the mod
 
@@ -112,7 +115,7 @@ The world still opens without crashing. Enchanters lose their profession and bec
 
 ### Incompatible mods
 
-A block can be the job site of only one villager profession, so mods that also make the enchanting table a job site cannot run together with this mod. NeoForge and Fabric show a clear error message at startup instead of crashing. Forge 1.21.11 cannot declare incompatible mods, so on Forge the game stops at startup with the error below instead.
+A block can be the job site of only one villager profession, so mods that also make the enchanting table a job site cannot run together with this mod. NeoForge and Fabric show a clear error message at startup instead of crashing. Forge 26.1 cannot declare incompatible mods, so on Forge the game stops at startup with the error below instead.
 
 | Mod | Mod ID | Reason |
 |---|---|---|
@@ -122,7 +125,7 @@ Any other mod that registers the enchanting table as a job site clashes the same
 
 ### Other mods
 
-- **Villager Trade Peek, Villager Trade Swap, Villager Trade Labels (1.21.11):** work together. The enchant screen is its own screen, not the trading screen, so those mods leave it alone.
+- **Villager Trade Peek, Villager Trade Swap, Villager Trade Labels (26.1):** work together. The enchant screen is its own screen, not the trading screen, so those mods leave it alone.
 - Enchantments added by other mods or datapacks are supported and appear in the config automatically.
 - Trades added to the Enchanter by other mods are ignored; the Enchanter never trades.
 

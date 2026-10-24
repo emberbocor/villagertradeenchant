@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSet;
 
 import io.github.emberbocor.villagertradeenchant.VillagerTradeEnchant;
 import io.github.emberbocor.villagertradeenchant.platform.Services;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -36,7 +37,7 @@ public final class EnchanterProfession {
 
     public static VillagerProfession createProfession() {
         return new VillagerProfession(Component.translatable("entity." + ID.getNamespace() + ".villager." + ID.getPath()),
-                poi -> poi.is(POI), poi -> poi.is(POI), ImmutableSet.of(), ImmutableSet.of(), SoundEvents.ENCHANTMENT_TABLE_USE);
+                poi -> poi.is(POI), poi -> poi.is(POI), ImmutableSet.of(), ImmutableSet.of(), SoundEvents.ENCHANTMENT_TABLE_USE, Int2ObjectMap.ofEntries());
     }
 
     public static boolean is(VillagerData data) {

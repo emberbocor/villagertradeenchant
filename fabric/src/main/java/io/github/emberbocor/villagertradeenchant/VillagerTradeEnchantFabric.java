@@ -13,8 +13,8 @@ public class VillagerTradeEnchantFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         FabricContent.register();
-        PayloadTypeRegistry.playS2C().register(EnchantEntriesPayload.TYPE, EnchantEntriesPayload.STREAM_CODEC);
-        PayloadTypeRegistry.playC2S().register(SelectEnchantPayload.TYPE, SelectEnchantPayload.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(EnchantEntriesPayload.TYPE, EnchantEntriesPayload.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(SelectEnchantPayload.TYPE, SelectEnchantPayload.STREAM_CODEC);
         ServerPlayNetworking.registerGlobalReceiver(SelectEnchantPayload.TYPE,
                 (payload, context) -> ServerPayloadHandler.handleSelection(context.player(), payload));
         ServerLifecycleEvents.SERVER_STARTING.register(server -> ServerConfig.load(server.registryAccess()));

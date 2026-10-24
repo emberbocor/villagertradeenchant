@@ -39,7 +39,7 @@ public final class EnchantMenu extends AbstractContainerMenu {
     private final Villager villager;
     @Nullable
     private final ServerPlayer owner;
-    private final SimpleContainer inputs = new SimpleContainer(2);
+    private final SimpleContainer inputs = new Inputs();
     private final ResultContainer result = new ResultContainer();
     private List<EnchantEntry> entries = List.of();
     @Nullable
@@ -55,7 +55,6 @@ public final class EnchantMenu extends AbstractContainerMenu {
         super(Services.PLATFORM.enchantMenuType(), containerId);
         this.villager = villager;
         this.owner = villager != null && inventory.player instanceof ServerPlayer player ? player : null;
-        inputs.addListener(this::slotsChanged);
 
         addSlot(new InputSlot(136, 37));
         addSlot(new Slot(inputs, PAYMENT_SLOT, 162, 37));
@@ -252,6 +251,18 @@ public final class EnchantMenu extends AbstractContainerMenu {
                 villager.setTradingPlayer(null);
             }
             clearContainer(player, inputs);
+        }
+    }
+
+    private class Inputs extends SimpleContainer {
+        Inputs() {
+            super(2);
+        }
+
+        @Override
+        public void setChanged() {
+            super.setChanged();
+            slotsChanged(this);
         }
     }
 

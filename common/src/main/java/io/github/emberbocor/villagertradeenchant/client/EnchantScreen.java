@@ -10,7 +10,7 @@ import io.github.emberbocor.villagertradeenchant.enchant.EnchantEntry;
 import io.github.emberbocor.villagertradeenchant.menu.EnchantMenu;
 import io.github.emberbocor.villagertradeenchant.network.SelectEnchantPayload;
 import io.github.emberbocor.villagertradeenchant.platform.ClientServices;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CyclingSlotBackground;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -58,8 +58,7 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
     private boolean dragging;
 
     public EnchantScreen(EnchantMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
-        imageWidth = 276;
+        super(menu, inventory, title, 276, 166);
         inventoryLabelX = 107;
     }
 
@@ -70,10 +69,9 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        renderTooltip(guiGraphics, mouseX, mouseY);
-        renderRowTooltip(guiGraphics, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+        extractRowTooltip(graphics, mouseX, mouseY);
     }
 
     private void updateRows() {
@@ -90,26 +88,27 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.drawString(font, title, 49 + imageWidth / 2 - font.width(title) / 2, 6, LABEL_COLOR, false);
-        guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, LABEL_COLOR, false);
-        guiGraphics.drawString(font, ENCHANTMENTS_LABEL, LIST_X - font.width(ENCHANTMENTS_LABEL) / 2 + 48, 6, LABEL_COLOR, false);
+    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        graphics.text(font, title, 49 + imageWidth / 2 - font.width(title) / 2, 6, LABEL_COLOR, false);
+        graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, LABEL_COLOR, false);
+        graphics.text(font, ENCHANTMENTS_LABEL, LIST_X - font.width(ENCHANTMENTS_LABEL) / 2 + 48, 6, LABEL_COLOR, false);
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(graphics, mouseX, mouseY, partialTick);
         updateRows();
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, leftPos, topPos, 0.0F, 0.0F, imageWidth, imageHeight, 512, 256);
-        inputSlotIcon.render(menu, guiGraphics, partialTick, leftPos, topPos);
-        renderScroller(guiGraphics, mouseX, mouseY);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, leftPos, topPos, 0.0F, 0.0F, imageWidth, imageHeight, 512, 256);
+        inputSlotIcon.extractRenderState(menu, graphics, partialTick, leftPos, topPos);
+        extractScroller(graphics, mouseX, mouseY);
         if (rows.isEmpty()) {
-            renderHint(guiGraphics);
+            extractHint(graphics);
             return;
         }
         EnchantEntry selected = menu.selectedEntry();
         int hoveredRow = rowAt(mouseX, mouseY);
         if (hoveredRow >= 0) {
-            guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
+            graphics.requestCursor(CursorTypes.POINTING_HAND);
         }
         for (int row = 0; row < Math.min(VISIBLE_ROWS, rows.size()); row++) {
             int index = scrollOff + row;
@@ -117,48 +116,48 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
             int x = leftPos + LIST_X;
             int y = topPos + LIST_Y + row * ROW_HEIGHT;
             boolean highlighted = index == hoveredRow || selected != null && enchantRow.entry().isSameOption(selected);
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, highlighted ? ROW_HIGHLIGHTED_SPRITE : ROW_SPRITE, x, y, ROW_WIDTH, ROW_HEIGHT);
-            guiGraphics.drawString(font, enchantRow.fit(font, NAME_WIDTH), x + NAME_X, y + 6, 0xFFFFFFFF, true);
-            guiGraphics.renderFakeItem(enchantRow.price(), x + PRICE_X, y + 2);
-            guiGraphics.renderItemDecorations(font, enchantRow.price(), x + PRICE_X, y + 2);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, highlighted ? ROW_HIGHLIGHTED_SPRITE : ROW_SPRITE, x, y, ROW_WIDTH, ROW_HEIGHT);
+            graphics.text(font, enchantRow.fit(font, NAME_WIDTH), x + NAME_X, y + 6, 0xFFFFFFFF, true);
+            graphics.fakeItem(enchantRow.price(), x + PRICE_X, y + 2);
+            graphics.itemDecorations(font, enchantRow.price(), x + PRICE_X, y + 2);
         }
     }
 
-    private void renderScroller(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    private void extractScroller(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         int x = leftPos + SCROLL_BAR_X;
         int y = topPos + LIST_Y;
         int hidden = rows.size() - VISIBLE_ROWS;
         if (hidden > 0) {
             int scrollerY = y + scrollOff * (SCROLL_BAR_HEIGHT - SCROLLER_HEIGHT + 1) / hidden;
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE, x, scrollerY, SCROLLER_WIDTH, SCROLLER_HEIGHT);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE, x, scrollerY, SCROLLER_WIDTH, SCROLLER_HEIGHT);
             if (mouseX >= x && mouseX < x + SCROLLER_WIDTH && mouseY >= scrollerY && mouseY <= scrollerY + SCROLLER_HEIGHT) {
-                guiGraphics.requestCursor(dragging ? CursorTypes.RESIZE_NS : CursorTypes.POINTING_HAND);
+                graphics.requestCursor(dragging ? CursorTypes.RESIZE_NS : CursorTypes.POINTING_HAND);
             }
         } else {
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_DISABLED_SPRITE, x, y, SCROLLER_WIDTH, SCROLLER_HEIGHT);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_DISABLED_SPRITE, x, y, SCROLLER_WIDTH, SCROLLER_HEIGHT);
         }
     }
 
-    private void renderHint(GuiGraphics guiGraphics) {
+    private void extractHint(GuiGraphicsExtractor graphics) {
         Component hint = menu.getSlot(EnchantMenu.INPUT_SLOT).hasItem() ? NO_ENCHANTMENTS_HINT : PUT_ITEM_HINT;
         List<FormattedCharSequence> lines = font.split(hint, ROW_WIDTH - 8);
         int y = topPos + LIST_Y + (SCROLL_BAR_HEIGHT - lines.size() * font.lineHeight) / 2;
         for (FormattedCharSequence line : lines) {
-            guiGraphics.drawString(font, line, leftPos + LIST_X + (ROW_WIDTH - font.width(line)) / 2, y, LABEL_COLOR, false);
+            graphics.text(font, line, leftPos + LIST_X + (ROW_WIDTH - font.width(line)) / 2, y, LABEL_COLOR, false);
             y += font.lineHeight;
         }
     }
 
-    private void renderRowTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    private void extractRowTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         int index = rowAt(mouseX, mouseY);
         if (index < 0 || !menu.getCarried().isEmpty()) {
             return;
         }
         EnchantRow row = rows.get(index);
         if (mouseX >= leftPos + LIST_X + PRICE_X - 2) {
-            guiGraphics.setTooltipForNextFrame(font, row.price(), mouseX, mouseY);
+            graphics.setTooltipForNextFrame(font, row.price(), mouseX, mouseY);
         } else if (!row.fits(font, NAME_WIDTH)) {
-            guiGraphics.setTooltipForNextFrame(font, row.fullName(), mouseX, mouseY);
+            graphics.setTooltipForNextFrame(font, row.fullName(), mouseX, mouseY);
         }
     }
 

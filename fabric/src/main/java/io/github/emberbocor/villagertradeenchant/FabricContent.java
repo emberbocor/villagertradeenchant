@@ -2,7 +2,7 @@ package io.github.emberbocor.villagertradeenchant;
 
 import io.github.emberbocor.villagertradeenchant.menu.EnchantMenu;
 import io.github.emberbocor.villagertradeenchant.villager.EnchanterProfession;
-import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
+import net.fabricmc.fabric.api.object.builder.v1.world.poi.PoiHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -18,7 +18,7 @@ public final class FabricContent {
     }
 
     static void register() {
-        PointOfInterestHelper.register(EnchanterProfession.ID, EnchanterProfession.MAX_TICKETS, EnchanterProfession.VALID_RANGE,
+        PoiHelper.register(EnchanterProfession.ID, EnchanterProfession.MAX_TICKETS, EnchanterProfession.VALID_RANGE,
                 EnchanterProfession.jobSiteStates());
         Registry.register(BuiltInRegistries.VILLAGER_PROFESSION, EnchanterProfession.ID, ENCHANTER);
         Registry.register(BuiltInRegistries.MENU, Identifier.fromNamespaceAndPath(VillagerTradeEnchant.MODID, "enchant"), ENCHANT_MENU);
