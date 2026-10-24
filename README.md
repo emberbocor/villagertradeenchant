@@ -112,7 +112,7 @@ The world still opens without crashing. Enchanters lose their profession and bec
 
 ### Incompatible mods
 
-A block can be the job site of only one villager profession, so mods that also make the enchanting table a job site cannot run together with this mod. NeoForge, Forge and Fabric refuse to start with a mod loading error that names the other mod instead of crashing.
+A block can be the job site of only one villager profession, so mods that also make the enchanting table a job site cannot run together with this mod. NeoForge and Fabric show a clear error message at startup instead of crashing. Forge 1.21.11 cannot declare incompatible mods, so on Forge the game stops at startup with the error below instead.
 
 | Mod | Mod ID | Reason |
 |---|---|---|

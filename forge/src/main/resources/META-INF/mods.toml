@@ -26,12 +26,3 @@ Adds an Enchanter villager that enchants your items for a configurable price.
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
-
-# Villager Enchanter also uses the enchanting table as a villager job site. Forge has no incompatible type:
-# an installed optional dependency outside its range stops loading with an error, and no version is below 0.
-[[dependencies.${mod_id}]]
-    modId="villager_enchanter"
-    mandatory=false
-    versionRange="(,0)"
-    ordering="NONE"
-    side="BOTH"
