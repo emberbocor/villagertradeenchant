@@ -3,6 +3,7 @@ package io.github.emberbocor.villagertradeenchant.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -17,6 +18,11 @@ import net.minecraft.world.item.Items;
 
 @Mixin(Villager.class)
 public abstract class VillagerMixin {
+    @Redirect(method = "customServerAiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/villager/Villager;isTrading()Z"))
+    private boolean villagertradeenchant$checkTradingWithoutOffers(Villager villager) {
+        return villager.isTrading() && !EnchanterProfession.is(villager.getVillagerData());
+    }
+
     @Inject(method = "updateTrades", at = @At("HEAD"), cancellable = true)
     private void villagertradeenchant$skipEnchanterTrades(CallbackInfo ci) {
         if (EnchanterProfession.is(((Villager) (Object) this).getVillagerData())) {

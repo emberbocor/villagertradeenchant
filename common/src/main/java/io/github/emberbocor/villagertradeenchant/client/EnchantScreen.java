@@ -3,6 +3,7 @@ package io.github.emberbocor.villagertradeenchant.client;
 import java.util.Comparator;
 import java.util.List;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 
 import io.github.emberbocor.villagertradeenchant.VillagerTradeEnchant;
@@ -178,7 +179,7 @@ public class EnchantScreen extends AbstractContainerScreen<EnchantMenu> {
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         dragging = false;
-        if (event.button() == 0) {
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             int x = leftPos + SCROLL_BAR_X;
             int y = topPos + LIST_Y;
             if (canScroll() && event.x() > x && event.x() < x + SCROLLER_WIDTH && event.y() > y && event.y() <= y + SCROLL_BAR_HEIGHT + 1) {
